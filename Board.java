@@ -1,4 +1,4 @@
-public class Board {
+public class Board implements Comparable<Board>{
 	
 	public static final int DEFAULT_BOARD_SIZEX = 3;
 	public static final int DEFAULT_BOARD_SIZEY = 3;
@@ -8,9 +8,11 @@ public class Board {
 	
 	private int[][] board;
 	
-	public String[][] misplacedBoard = new String[10][10];
 	
+	public String[][] misplacedBoard;
 	public int misplacedTiles =0;
+	
+	public int heuristic;
 	
 	public int blankPosX;
 	public int blankPosY;
@@ -21,6 +23,10 @@ public class Board {
 		{8,0,4},
 		{7,6,5}
 	};
+	public static boolean goalStatus = false;
+	
+	public int level = 0;
+	
 	public int[][] start_state;//state of board at the start
 	public int[][] current_state;//state of board when changes are made
 	
@@ -30,6 +36,7 @@ public class Board {
 		Board.boardSizeX = boardSizeX;
 		Board.boardSizeY = boardSizeY;
 		this.board = board;
+		misplacedBoard = new String[boardSizeY][boardSizeX];
 		start_state = new int[boardSizeY][boardSizeX];
 		current_state = new int[boardSizeY][boardSizeX];
 		initializeBoard(board);
@@ -45,13 +52,19 @@ public class Board {
 			throw new IllegalArgumentException("Size of the board is required");
 		}
 		copyBoards();
-		findBlankPos();
+		findBlankPos();		
 	}
 	
-	private void findBlankPos(){//find blank position
+	private void checkGoalStatus(){
+		if(misplacedTiles == 0){
+			goalStatus = true;
+		}
+	}
+	
+	public void findBlankPos(){//find blank position
 		for(int y =0; y<boardSizeY;y++){	
 			for(int x=0;x<boardSizeX;x++){
-				if(board[y][x] == 0){
+				if(start_state[y][x] == 0){
 					blankPosX = x;
 					blankPosY = y;
 				}
@@ -79,7 +92,7 @@ public class Board {
 	}
 
 	
-	public int compareBoards(){
+	public int compareBoards(){//compares goal board with this board
 		for(int y =0; y<boardSizeY;y++){	
 			for(int x=0;x<boardSizeX;x++){
 				if(GOAL_STATE[y][x] == start_state[y][x] || start_state[y][x] ==0){
@@ -91,6 +104,7 @@ public class Board {
 				}
 			}
 		}
+		checkGoalStatus();
 		return misplacedTiles;
 	}	
 	
@@ -118,34 +132,22 @@ public class Board {
 		}
 	}
 	
+	
+	@Override
+	public int compareTo(Board otherBoard) {
+		
+		if(this.heuristic<otherBoard.heuristic)
+		{
+			return -1;
+		}
+		else if (this.heuristic>otherBoard.heuristic)
+		{
+			return 1;
+		}
+		
+		return 0;
+	}
+	
 }
-
-
-//real
-//public int compareBoards(){
-//	for(int x =0; x<boardSizeX;x++){	
-//		for(int y=0;y<boardSizeY;y++){
-//			if(GOAL_STATE[x][y] == board[x][y] || board[x][y] ==0){
-//				int value = board[x][y];
-//				misplacedBoard[x][y] = Integer.toString(value);
-//			}else{
-//				misplacedBoard[x][y] = "X";
-//				misplacedTiles++;
-//			}
-//		}
-//	}
-//	return misplacedTiles;
-//}
-
-////real method
-//public void displayBoard(int board[][]){
-//	
-//	for(int y =0; y<boardSizeX;y++){	
-//		for(int x=0;x<boardSizeY;x++){
-//			System.out.print(board[y][x] +" ");
-//		}
-//		System.out.println();
-//	}
-//}
 
 

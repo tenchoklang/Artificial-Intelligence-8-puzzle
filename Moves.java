@@ -16,7 +16,6 @@ public class Moves {
 				return true;
 			}
 			System.out.println("can't move UP");
-
 			break;
 
 		case "down":
@@ -25,15 +24,14 @@ public class Moves {
 				return true;
 			}
 			System.out.println("can't move DOWN");
-
 			break;
+			
 		case "left":
 			if(board.blankPosX >0 ){
 				System.out.println("can move LEFT");
 				return true;
 			}
 			System.out.println("can't move LEFT");
-
 			break;
 		case "right":
 			if(board.blankPosX <2 ){
