@@ -1,3 +1,7 @@
+
+/*
+ */
+
 public class Board implements Comparable<Board>{
 	
 	public static final int DEFAULT_BOARD_SIZEX = 3;
@@ -6,13 +10,9 @@ public class Board implements Comparable<Board>{
 	public static int boardSizeX;
 	public static int boardSizeY;
 	
-	private int[][] board;
+	public int misplacedTiles;
 	
-	
-	public String[][] misplacedBoard;
-	public int misplacedTiles =0;
-	
-	public int manhattanDistance = 0;
+	public int manhattanDistance;
 	
 	public int heuristic;
 	
@@ -25,10 +25,11 @@ public class Board implements Comparable<Board>{
 		{8,0,4},
 		{7,6,5}
 	};
+	
 	public static boolean goalStatus = false;
 	public static Board answerBoard;//the final answer that an algorithm has found, so we can backtrack the path
 	
-	public Board parentBoard;
+	public Board parentBoard;//helps with backtracking the path taken
 	
 	public int level = 0;
 	
@@ -40,25 +41,15 @@ public class Board implements Comparable<Board>{
 	public Board(int[][] board, int boardSizeX, int boardSizeY){//main constructor	
 		Board.boardSizeX = boardSizeX;
 		Board.boardSizeY = boardSizeY;
-		this.board = board;
-		misplacedBoard = new String[boardSizeY][boardSizeX];
 		start_state = new int[boardSizeY][boardSizeX];
-		current_state = new int[boardSizeY][boardSizeX];
-		initializeBoard(board);
+		copyBoard(board);
+		findBlankPos();
 	}
 	
 	public Board(int[][] board){
 		this(board, DEFAULT_BOARD_SIZEX,DEFAULT_BOARD_SIZEY);//calls main
 	}
 	
-	
-	private void initializeBoard(int[][] board){
-		if(board.length != boardSizeY || board[0].length != boardSizeX){//board size required if not default
-			throw new IllegalArgumentException("Size of the board is required");
-		}
-		copyBoards();
-		findBlankPos();		
-	}
 	
 	private void checkGoalStatus(){
 		if(misplacedTiles == 0){
@@ -78,11 +69,10 @@ public class Board implements Comparable<Board>{
 		}
 	}
 	
-	private void copyBoards(){//copy by value
+	private void copyBoard(int[][] board){//copy by value
 		for(int y=0;y<boardSizeY;y++){
 			for(int x=0;x<boardSizeX;x++){
 				start_state[y][x] = board[y][x];
-				current_state[y][x] = board[y][x];
 			}
 		}
 	}
@@ -102,31 +92,47 @@ public class Board implements Comparable<Board>{
 		for(int y =0; y<boardSizeY;y++){	
 			for(int x=0;x<boardSizeX;x++){
 				if(GOAL_STATE[y][x] == start_state[y][x] || start_state[y][x] ==0){//if same or blank dont change anything
-					int value = start_state[y][x];
-					misplacedBoard[y][x] = Integer.toString(value);
+
 				}else{
-					misplacedBoard[y][x] = "X";
 					misplacedTiles++;
 				}
 			}
 		}
-		checkGoalStatus();
+		checkGoalStatus();//checks if this is the goal state after making the move
 		return misplacedTiles;
 	}	
 	
+	public int getHeuristic(String algorithm){
+		
+		algorithm.toLowerCase();
+		switch(algorithm){
+		
+		case "astar heuristic":
+			level = parentBoard.level + 1;//update the level
+			heuristic = level + misplacedTiles;
+			break;
+			
+		case "astar manhattan":
+			level = parentBoard.level + 1;//update the level
+			heuristic = level + findManhattanDistance(start_state, GOAL_STATE);
+			break;
+			
+		case "astar iterative deepining":
+			
+			break;
+		
+		case "dfbnb":
+		
+			break;
+			
+		default: 
+			System.out.println("Algorithm not found");
+			
+		}
+		
+		return heuristic;
+	}
 
-//	public int[][] getBoard() {
-//		return board;
-//	}
-//
-//	public void setBoard(int[][] board) {
-//		this.board = board;
-//	}
-//
-//	public static int[][] getGoalState() {
-//		return GOAL_STATE;
-//	}
-//	
 	
 	public static void displayMisplacedBoard(String board[][]){
 		
@@ -138,9 +144,66 @@ public class Board implements Comparable<Board>{
 		}
 	}
 	
+
+	public static int findManhattanDistance(int[][] easyBoard, int[][] GOAL_STATE){
+		
+		int totalDistance = 0;
+		for(int y=0;y<3;y++){
+			for(int x=0;x<3;x++){
+				
+				if(easyBoard[y][x] != 0){
+					int number = easyBoard[y][x];
+					/*
+					 * Finds the Number in the GOAL_STATE that you know the coordinate to in the Board
+					 */
+					int[] coordinates = findNumber(GOAL_STATE, number);
+					int XPositionInGoalState = coordinates[1];
+					int YPositionInGoalState = coordinates[0];
+					
+					//System.out.println("EasyBoard Location of Number: " + easyBoard[y][x] + " X " + coordinate1[1] + " Y " + coordinate1[0]);
+					//System.out.println("GoalBoard Location of Number: " + easyBoard[y][x] + " X " + coordinates[1] + " Y " + coordinates[0]);
+				
+					int verticalDistance = findDistance(x,XPositionInGoalState);
+					int horizontalDistance = findDistance(y,YPositionInGoalState);
+//					System.out.println("DISTANCE OF NUMBER: " + number);
+//					System.out.println("Vertical Distance   = " + verticalDistance);
+//					System.out.println("Horizontal Distance = " + horizontalDistance);
+					
+					totalDistance = totalDistance + (verticalDistance + horizontalDistance);
+				
+				}
+				
+			}
+		}
+		return totalDistance;
+	}
+	
+	public static int findDistance(int position1, int position2){
+		int distance = Math.abs(position1 - position2);
+		return distance;	
+	}
+	
+	public static int[] findNumber(int[][] board, int number){
+		
+		int[] coordinate = new int[2];
+		
+		for(int y=0;y<3;y++){
+			for(int x=0;x<3;x++){
+				if(board[y][x] == number){
+					coordinate[0] = y;
+					coordinate[1] = x;
+					return coordinate;
+				}
+			}
+		}
+		System.out.println("NUMBER NOT FOUND");
+		return null;
+		
+	}
+	
 	
 	@Override
-	public int compareTo(Board otherBoard) {//override, used by binaryHeap to prioritize
+	public int compareTo(Board otherBoard) {//override, used by binaryHeap to prioritize heuristic
 		
 		if(this.heuristic<otherBoard.heuristic)
 		{
@@ -154,5 +217,6 @@ public class Board implements Comparable<Board>{
 	}
 	
 }
+
 
 
