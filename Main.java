@@ -1,196 +1,243 @@
-/*
- * Able to solve easy, medium and hard board
- * Worst case board not being solved, possibility of it looping the same path again and again
- */
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
 
+/*
+ * Implement hash map to detect duplicate states
+ * ---unsure of what the key to the hash map would be...abandoned that idea
+ * 
+ * Implement Linked Links to detect duplicate states
+ */
 
 
 public class Main {
 
 	public static void main(String[] args) {
 		
-		int[][] board = new int[][]{
+		int[][] easyBoard = new int[][]{
+			{1,3,4},
+			{8,6,2},
+			{7,0,5}
+		};
+		
+		int[][] mediumBoard = new int[][]{
+			{2,8,1},
+			{0,4,3},
+			{7,6,5}
+		};
+		
+		int[][] hardBoard = new int[][]{
 			{2,8,1},
 			{4,6,3},
 			{0,7,5}
 		};
-
-		Board easyBoard = new Board(board);
-		easyBoard.compareBoards();
 		
-
-//		System.out.println("BOARD goal state");
-//		easyBoard.displayBoard(Board.getGoalState());
-//		System.out.println();
-//		
-//		System.out.println("BOARD start state");
-//		easyBoard.displayBoard(easyBoard.start_state);
-//		System.out.println("Blank Tile AT X:"+ easyBoard.blankPosX + " Y:"+ easyBoard.blankPosY);
-//		System.out.println();
-//		
-//		Moves.verifyMove("up", easyBoard);
-//		Moves.verifyMove("down", easyBoard);
-//		Moves.verifyMove("left", easyBoard);
-//		Moves.verifyMove("right", easyBoard);
+		int[][] worstBoard = new int[][]{
+			{5,6,7},
+			{4,0,8},
+			{3,2,1}
+		};
 		
-//		System.out.println("Misplaced tiles = " + easyBoard.compareBoards());
-//		Board.displayMisplacedBoard(easyBoard.misplacedBoard);
-//		System.out.println();
-//		BinaryHeap<Board> priorityQueue = new BinaryHeap<Board>();
-//		//priorityQueue.insert(easyBoard);
+		
+		int[][] testBoard = new int[][]{
+			{3,0,2},
+			{6,5,1},
+			{4,7,8}
+		};
+		
+		int[][] testBoard2 = new int[][]{
+			{3,0,2},
+			{6,5,1},
+			{4,7,8}
+		};
+
+
+
+
+		Board board = new Board(testBoard);
+		board.parentBoard = null;
+		board.findMisplacedTiles();
+		Board board2 = new Board(testBoard2);
+
+		BinaryHeap<Board> openList = new BinaryHeap<Board>();
+		
+		List<List<Integer>> testList = new ArrayList<>();
+		
+		testList.add(Arrays.asList(5,6,7));
+		testList.add(Arrays.asList(4,0,8));
+		testList.add(Arrays.asList(3,2,1));
+
+		/*
+		 * to add to the closed list first we need to get it into <List<List<Integer>> form which will 
+		 * act as a 2d - array, we can't use 2d - array directly because it is not identifiable as a key
+		 * closedList.put(Collections.unmodifiableList(testList), board);<-- key solution found on stack overflow
+		 */
+		HashMap<List<List<Integer>>, Board> closedList = new HashMap<>();
+		
+		
+		addToClosedList(board, closedList);
+		
+		System.out.println(checkClosedList(board2, closedList));
+		
+		
+//		closedList.put(Collections.unmodifiableList(testList), board);
+//		
+//		List<List<Integer>> checkList = new ArrayList<>();
+//		
+//		checkList.add(Arrays.asList(5,6,7));
+//		checkList.add(Arrays.asList(4,0,8));
+//		checkList.add(Arrays.asList(3,2,1));
+//		
+//		closedList.get(checkList).displayBoard(closedList.get(checkList).start_state);
+//		
+//		addToClosedList(board, closedList);
+		
+		
+		
+//		while(Board.goalStatus == false){//add a way to check if there is any other lower heuristic function
+//			
+//				System.out.println("|||||||||||||||||||||||||||||");
+//				if(Moves.verifyMove("up", board)){
+//					System.out.println("Old Board START STATE");
+//					board.displayBoard(board.start_state);
+//					Board newBoard = new Board(board.start_state);//board with the changes made
+//					newBoard.level = board.level +1;//board level = parent board level + 1
+//					Moves.move("up", newBoard);
+//					System.out.println("New Board 1 START STATE");
+//					newBoard.displayBoard(newBoard.start_state);
+//					System.out.println("Misplaced tiles = " + newBoard.findMisplacedTiles());
+//					newBoard.heuristic = newBoard.level + newBoard.misplacedTiles;
+//					System.out.println("Heuristic = "+newBoard.heuristic);
 //
-//		System.out.println("|||||||||||||||||||||||||||||");
-//		if(Moves.verifyMove("up", easyBoard)){
-//			System.out.println("Old Board START STATE");
-//			easyBoard.displayBoard(easyBoard.start_state);
-//			Board newBoard1 = new Board(easyBoard.current_state);//board with the changes made
-//			Moves.move("up", newBoard1);
-//			System.out.println("New Board 1 START STATE");
-//			newBoard1.displayBoard(newBoard1.start_state);
-//			System.out.println("Misplaced tiles = " + newBoard1.compareBoards());
-//			Board.displayMisplacedBoard(newBoard1.misplacedBoard);
-//			
-//			newBoard1.heuristic = 1+ newBoard1.misplacedTiles;
-//			priorityQueue.insert(newBoard1);
+//					Board.displayMisplacedBoard(newBoard.misplacedBoard);				
+//					openList.insert(newBoard);
+//					
+//					newBoard.parentBoard = board;
+//		
+//				}
+//				System.out.println("|||||||||||||||||||||||||||||");
+//				
+//				if(Moves.verifyMove("down", board)){
+//					System.out.println("Old Board START STATE");
+//					board.displayBoard(board.start_state);
+//					Board newBoard = new Board(board.start_state);//board with the changes made
+//					newBoard.level = board.level +1;
+//					Moves.move("down", newBoard);
+//					System.out.println("New Board 3 START STATE");
+//					newBoard.displayBoard(newBoard.start_state);
+//					System.out.println("Misplaced tiles = " + newBoard.findMisplacedTiles());
+//					newBoard.heuristic = newBoard.level + newBoard.misplacedTiles;
+//					System.out.println("Heuristic = "+newBoard.heuristic);
 //
-//		}
-//		System.out.println("|||||||||||||||||||||||||||||");
-//		
-//		if(Moves.verifyMove("down", easyBoard)){
-//			System.out.println("Old Board START STATE");
-//			easyBoard.displayBoard(easyBoard.start_state);
-//			Board newBoard2 = new Board(easyBoard.current_state);//board with the changes made
-//			Moves.move("down", newBoard2);
-//			System.out.println("New Board 3 START STATE");
-//			newBoard2.displayBoard(newBoard2.start_state);
-//			System.out.println("Misplaced tiles = " + newBoard2.compareBoards());
-//			Board.displayMisplacedBoard(newBoard2.misplacedBoard);
+//					Board.displayMisplacedBoard(newBoard.misplacedBoard);
+//					openList.insert(newBoard);
+//					
+//					newBoard.parentBoard = board;
+//
+//				}
+//				System.out.println("|||||||||||||||||||||||||||||");
+//				
+//				if(Moves.verifyMove("left", board)){
+//					System.out.println("Old Board START STATE");
+//					board.displayBoard(board.start_state);
+//					Board newBoard = new Board(board.start_state);//board with the changes made
+//					newBoard.level = board.level +1;
+//					Moves.move("left", newBoard);
+//					System.out.println("New Board 3 START STATE");
+//					newBoard.displayBoard(newBoard.start_state);
+//					System.out.println("Misplaced tiles = " + newBoard.findMisplacedTiles());
+//					newBoard.heuristic = newBoard.level + newBoard.misplacedTiles;
+//					System.out.println("Heuristic = "+newBoard.heuristic);
+//
+//					Board.displayMisplacedBoard(newBoard.misplacedBoard);
+//					openList.insert(newBoard);
+//					
+//					newBoard.parentBoard = board;
+//
+//				}
+//				System.out.println("|||||||||||||||||||||||||||||");
+//				
+//				if(Moves.verifyMove("right", board)){
+//					System.out.println("Old Board START STATE");
+//					board.displayBoard(board.start_state);
+//					Board newBoard = new Board(board.start_state);//board with the changes made
+//					newBoard.level = board.level +1;
+//					Moves.move("right", newBoard);
+//					System.out.println("New Board 3 START STATE");
+//					newBoard.displayBoard(newBoard.start_state);
+//					System.out.println("Misplaced tiles = " + newBoard.findMisplacedTiles());
+//					newBoard.heuristic = newBoard.level + newBoard.misplacedTiles;
+//					System.out.println("Heuristic = "+newBoard.heuristic);
+//					Board.displayMisplacedBoard(newBoard.misplacedBoard);
+//					openList.insert(newBoard);
+//					
+//					newBoard.parentBoard = board;
+//
+//				}
+//				System.out.println("|||||||||||||||||||||||||||||");
 //			
-//			newBoard2.heuristic = 1+ newBoard2.misplacedTiles;
-//			priorityQueue.insert(newBoard2);
-//		}
-//		System.out.println("|||||||||||||||||||||||||||||");
-//		
-//		if(Moves.verifyMove("left", easyBoard)){
-//			System.out.println("Old Board START STATE");
-//			easyBoard.displayBoard(easyBoard.start_state);
-//			Board newBoard3 = new Board(easyBoard.current_state);//board with the changes made
-//			Moves.move("left", newBoard3);
-//			System.out.println("New Board 3 START STATE");
-//			newBoard3.displayBoard(newBoard3.start_state);
-//			System.out.println("Misplaced tiles = " + newBoard3.compareBoards());
-//			Board.displayMisplacedBoard(newBoard3.misplacedBoard);
 //			
-//			newBoard3.heuristic = 1+ newBoard3.misplacedTiles;
-//			priorityQueue.insert(newBoard3);
+//			int boardLevel = board.level +1;
+//			System.out.println("BOARD LEVEL " + boardLevel);
+//			closedList.add(board.start_state);
+//			board = openList.deleteMinimum();
+//			board.findBlankPos();
+//			ctr++;
+//			System.out.println("--------------------------------");
 //		}
-//		System.out.println("|||||||||||||||||||||||||||||");
+//
 //		
-//		if(Moves.verifyMove("right", easyBoard)){
-//			System.out.println("Old Board START STATE");
-//			easyBoard.displayBoard(easyBoard.start_state);
-//			Board newBoard4 = new Board(easyBoard.current_state);//board with the changes made
-//			Moves.move("right", newBoard4);
-//			System.out.println("New Board 3 START STATE");
-//			newBoard4.displayBoard(newBoard4.start_state);
-//			System.out.println("Misplaced tiles = " + newBoard4.compareBoards());
-//			Board.displayMisplacedBoard(newBoard4.misplacedBoard);
-//			
-//			newBoard4.heuristic = 1+ newBoard4.misplacedTiles;
-//			priorityQueue.insert(newBoard4);
+//		
+//		System.out.println("ANSWER BOARD");
+//		
+//		Board currentState = Board.answerBoard;
+//		//displays the path from start state to goal state
+//		int nodesVisited = 0;
+//		while(currentState != null){
+//			currentState.displayBoard(currentState.start_state);
+//			currentState  = currentState.parentBoard;
+//			nodesVisited++;
+//			System.out.println();
 //		}
-//		System.out.println("|||||||||||||||||||||||||||||");
-
-
-		
-		
-		BinaryHeap<Board> priorityQueue = new BinaryHeap<Board>();
-		
-		while(Board.goalStatus == false){//add a way to check if there is any other lower heuristic function
-			System.out.println("|||||||||||||||||||||||||||||");
-			if(Moves.verifyMove("up", easyBoard)){
-				System.out.println("Old Board START STATE");
-				easyBoard.displayBoard(easyBoard.start_state);
-				Board newBoard = new Board(easyBoard.start_state);//board with the changes made
-				newBoard.level = easyBoard.level +1;
-				Moves.move("up", newBoard);
-				System.out.println("New Board 1 START STATE");
-				newBoard.displayBoard(newBoard.start_state);
-				System.out.println("Misplaced tiles = " + newBoard.compareBoards());
-				newBoard.heuristic = newBoard.level + newBoard.misplacedTiles;
-				System.out.println("Heuristic = "+newBoard.heuristic);
-
-				Board.displayMisplacedBoard(newBoard.misplacedBoard);				
-				priorityQueue.insert(newBoard);
-	
-			}
-			System.out.println("|||||||||||||||||||||||||||||");
-			
-			if(Moves.verifyMove("down", easyBoard)){
-				System.out.println("Old Board START STATE");
-				easyBoard.displayBoard(easyBoard.start_state);
-				Board newBoard = new Board(easyBoard.start_state);//board with the changes made
-				newBoard.level = easyBoard.level +1;
-				Moves.move("down", newBoard);
-				System.out.println("New Board 3 START STATE");
-				newBoard.displayBoard(newBoard.start_state);
-				System.out.println("Misplaced tiles = " + newBoard.compareBoards());
-				newBoard.heuristic = newBoard.level + newBoard.misplacedTiles;
-				System.out.println("Heuristic = "+newBoard.heuristic);
-
-				Board.displayMisplacedBoard(newBoard.misplacedBoard);
-				priorityQueue.insert(newBoard);
-			}
-			System.out.println("|||||||||||||||||||||||||||||");
-			
-			if(Moves.verifyMove("left", easyBoard)){
-				System.out.println("Old Board START STATE");
-				easyBoard.displayBoard(easyBoard.start_state);
-				Board newBoard = new Board(easyBoard.start_state);//board with the changes made
-				newBoard.level = easyBoard.level +1;
-				Moves.move("left", newBoard);
-				System.out.println("New Board 3 START STATE");
-				newBoard.displayBoard(newBoard.start_state);
-				System.out.println("Misplaced tiles = " + newBoard.compareBoards());
-				newBoard.heuristic = newBoard.level + newBoard.misplacedTiles;
-				System.out.println("Heuristic = "+newBoard.heuristic);
-
-				Board.displayMisplacedBoard(newBoard.misplacedBoard);
-				priorityQueue.insert(newBoard);
-			}
-			System.out.println("|||||||||||||||||||||||||||||");
-			
-			if(Moves.verifyMove("right", easyBoard)){
-				System.out.println("Old Board START STATE");
-				easyBoard.displayBoard(easyBoard.start_state);
-				Board newBoard = new Board(easyBoard.start_state);//board with the changes made
-				newBoard.level = easyBoard.level +1;
-				Moves.move("right", newBoard);
-				System.out.println("New Board 3 START STATE");
-				newBoard.displayBoard(newBoard.start_state);
-				System.out.println("Misplaced tiles = " + newBoard.compareBoards());
-				newBoard.heuristic = newBoard.level + newBoard.misplacedTiles;
-				System.out.println("Heuristic = "+newBoard.heuristic);
-				Board.displayMisplacedBoard(newBoard.misplacedBoard);
-				priorityQueue.insert(newBoard);
-			}
-			System.out.println("|||||||||||||||||||||||||||||");
-			
-			int boardLevel = easyBoard.level +1;
-			System.out.println("BOARD LEVEL " + boardLevel);
-			easyBoard = priorityQueue.deleteMinimum();
-			easyBoard.findBlankPos();
-			
-			
-			
-			System.out.println("--------------------------------");
-		}
-		
+//		nodesVisited--;
+//		System.out.println(nodesVisited);
 		
 		
 		
 		
 		
 	}
-
+	
+	public static void addToClosedList(Board board,  HashMap<List<List<Integer>>, Board> closedList){
+		
+		int arrayAsList[] = new int[3];
+		List<List<Integer>> list = new ArrayList<>();
+		
+		for(int y =0; y<Board.boardSizeY;y++){	
+			for(int x=0;x<Board.boardSizeY;x++){
+				arrayAsList[x] = board.start_state[y][x];
+			}
+			list.add(Arrays.asList(arrayAsList[0],arrayAsList[1],arrayAsList[2]));
+		}
+		
+		closedList.put(Collections.unmodifiableList(list), board);//list now can be used as a key in the hashMap
+		
+	}
+	
+	public static boolean checkClosedList(Board board, HashMap<List<List<Integer>>, Board> closedList){
+		int arrayAsList[] = new int[3];//so we can do Arrays.asList(...) with the array as one of the rows
+		List<List<Integer>> list = new ArrayList<>();
+		
+		for(int y =0; y<Board.boardSizeY;y++){	
+			for(int x=0;x<Board.boardSizeY;x++){
+				arrayAsList[x] = board.start_state[y][x];
+			}
+			list.add(Arrays.asList(arrayAsList[0],arrayAsList[1],arrayAsList[2]));
+		}
+		
+		return closedList.containsKey(list);
+	}
 }

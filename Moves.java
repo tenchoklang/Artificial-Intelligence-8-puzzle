@@ -52,18 +52,14 @@ public class Moves {
 		case "up":
 			//board.current_state = board.start_state;//resetting the board
 			int neighborUP = board.start_state[board.blankPosY-1][board.blankPosX];
-			
 			board.start_state[board.blankPosY-1][board.blankPosX] = 0;//place 0 at neighbor value
-			
 			board.start_state[board.blankPosY][board.blankPosX] = neighborUP;//place neighbor at blank
-			
 			System.out.println("Moving Up and Replacing " + neighborUP + " with 0");
 			break;
 
 		case "down":
 			//board.current_state = board.start_state;//resetting the board
 			int neighborDOWN = board.start_state[board.blankPosY+1][board.blankPosX];
-			
 			board.start_state[board.blankPosY+1][board.blankPosX] = 0;
 			board.start_state[board.blankPosY][board.blankPosX] = neighborDOWN;
 			System.out.println("Moving Down and Replacing " + neighborDOWN + " with 0");
@@ -73,7 +69,6 @@ public class Moves {
 			//board.current_state = board.start_state;//resetting the board
 			
 			int neighborLEFT = board.start_state[board.blankPosY][board.blankPosX-1];
-			
 			board.start_state[board.blankPosY][board.blankPosX-1] = 0;
 			board.start_state[board.blankPosY][board.blankPosX] = neighborLEFT;
 			System.out.println("Moving Left and Replacing " + neighborLEFT + " with 0");
@@ -82,7 +77,6 @@ public class Moves {
 		case "right":
 			//board.start_state = board.start_state;//resetting the board
 			int neighborRIGHT = board.start_state[board.blankPosY][board.blankPosX+1];
-			
 			board.start_state[board.blankPosY][board.blankPosX+1] = 0;
 			board.start_state[board.blankPosY][board.blankPosX] = neighborRIGHT;
 			System.out.println("Moving right and Replacing " + neighborRIGHT + " with 0");

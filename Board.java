@@ -3,8 +3,8 @@ public class Board implements Comparable<Board>{
 	public static final int DEFAULT_BOARD_SIZEX = 3;
 	public static final int DEFAULT_BOARD_SIZEY = 3;
 	
-	private static int boardSizeX;
-	private static int boardSizeY;
+	public static int boardSizeX;
+	public static int boardSizeY;
 	
 	private int[][] board;
 	
@@ -12,10 +12,12 @@ public class Board implements Comparable<Board>{
 	public String[][] misplacedBoard;
 	public int misplacedTiles =0;
 	
+	public int manhattanDistance = 0;
+	
 	public int heuristic;
 	
-	public int blankPosX;
-	public int blankPosY;
+	public int blankPosX;//X position of the blank tile
+	public int blankPosY;//Y position of the blank tile
 
 	
 	private static final int[][] GOAL_STATE = new int[][]{
@@ -24,6 +26,9 @@ public class Board implements Comparable<Board>{
 		{7,6,5}
 	};
 	public static boolean goalStatus = false;
+	public static Board answerBoard;//the final answer that an algorithm has found, so we can backtrack the path
+	
+	public Board parentBoard;
 	
 	public int level = 0;
 	
@@ -57,6 +62,7 @@ public class Board implements Comparable<Board>{
 	
 	private void checkGoalStatus(){
 		if(misplacedTiles == 0){
+			answerBoard = this;//backtrack from this path to find the right path
 			goalStatus = true;
 		}
 	}
@@ -92,10 +98,10 @@ public class Board implements Comparable<Board>{
 	}
 
 	
-	public int compareBoards(){//compares goal board with this board
+	public int findMisplacedTiles(){//compares goal board with this board
 		for(int y =0; y<boardSizeY;y++){	
 			for(int x=0;x<boardSizeX;x++){
-				if(GOAL_STATE[y][x] == start_state[y][x] || start_state[y][x] ==0){
+				if(GOAL_STATE[y][x] == start_state[y][x] || start_state[y][x] ==0){//if same or blank dont change anything
 					int value = start_state[y][x];
 					misplacedBoard[y][x] = Integer.toString(value);
 				}else{
@@ -109,18 +115,18 @@ public class Board implements Comparable<Board>{
 	}	
 	
 
-	public int[][] getBoard() {
-		return board;
-	}
-
-	public void setBoard(int[][] board) {
-		this.board = board;
-	}
-
-	public static int[][] getGoalState() {
-		return GOAL_STATE;
-	}
-	
+//	public int[][] getBoard() {
+//		return board;
+//	}
+//
+//	public void setBoard(int[][] board) {
+//		this.board = board;
+//	}
+//
+//	public static int[][] getGoalState() {
+//		return GOAL_STATE;
+//	}
+//	
 	
 	public static void displayMisplacedBoard(String board[][]){
 		
@@ -134,7 +140,7 @@ public class Board implements Comparable<Board>{
 	
 	
 	@Override
-	public int compareTo(Board otherBoard) {
+	public int compareTo(Board otherBoard) {//override, used by binaryHeap to prioritize
 		
 		if(this.heuristic<otherBoard.heuristic)
 		{
@@ -144,7 +150,6 @@ public class Board implements Comparable<Board>{
 		{
 			return 1;
 		}
-		
 		return 0;
 	}
 	
