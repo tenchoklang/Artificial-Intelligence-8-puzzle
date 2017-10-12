@@ -1,89 +1,103 @@
-
+/*
+ * The move class does two main things
+ * 1) It verifies if we can move in a certain direction 
+ * 2) It move in the direction specified in the parameter here it also 
+ * 	  after it moves the tile, it checks and updates the misplaced count
+ */
 public class Moves {
 
-	private Moves(){
+	private Moves(){//non instantiable
 		
 	}
 	
-	
+	/*
+	 * Checks if we can move in a specified direction
+	 * 		  0   1   2
+	 * 		--------------
+	 * 	0	|__	|__	|__	|
+	 * 	1	|__	|__	|__	|
+	 * 	2	|	|	|	|	
+	 * 		--------------
+	 * imagine a board like this if we want to move up we know that it has to be > 0
+	 * otherwise it would be out of bounds like wise if we want to move down
+	 * it has to be < 2 in this case, otherwise it would be out of bounds 
+	 * 
+	 */
 	public static boolean verifyMove(String direction, Board board){
 		
 		switch(direction){
 		
 		case "up":
 			if(board.blankPosY > 0){
-				System.out.println("can move UP");
+				//System.out.println("can move UP");
 				return true;
 			}
-			System.out.println("can't move UP");
+			//System.out.println("can't move UP");
 			break;
 
 		case "down":
-			if(board.blankPosY <2 ){
-				System.out.println("can move DOWN");
+			if(board.blankPosY < Board.boardSizeY -1 ){
+				//System.out.println("can move DOWN");
 				return true;
 			}
-			System.out.println("can't move DOWN");
+			//System.out.println("can't move DOWN");
 			break;
 			
 		case "left":
 			if(board.blankPosX >0 ){
-				System.out.println("can move LEFT");
+				//System.out.println("can move LEFT");
 				return true;
 			}
-			System.out.println("can't move LEFT");
+			//System.out.println("can't move LEFT");
 			break;
 		case "right":
-			if(board.blankPosX <2 ){
-				System.out.println("can move RIGHT");
+			if(board.blankPosX < Board.boardSizeX-1 ){
+				//System.out.println("can move RIGHT");
 				return true;
 			}
-			System.out.println("can't move RIGHT");
+			//System.out.println("can't move RIGHT");
 
 			break;
 		}
 		return false;
 	}
 	
-	
+	/*
+	 * Moves in a specified direction
+	 */
 	public static void move(String direction, Board board){
+
 		switch(direction){
 		
 		case "up":
-			//board.current_state = board.start_state;//resetting the board
-			int neighborUP = board.start_state[board.blankPosY-1][board.blankPosX];
-			board.start_state[board.blankPosY-1][board.blankPosX] = 0;//place 0 at neighbor value
-			board.start_state[board.blankPosY][board.blankPosX] = neighborUP;//place neighbor at blank
-			System.out.println("Moving Up and Replacing " + neighborUP + " with 0");
+			swapTiles(board, "up", board.blankPosY, board.blankPosX, board.blankPosY-1, board.blankPosX);
+			board.blankPosY = board.blankPosY -1;//update the new blank position
 			break;
 
 		case "down":
-			//board.current_state = board.start_state;//resetting the board
-			int neighborDOWN = board.start_state[board.blankPosY+1][board.blankPosX];
-			board.start_state[board.blankPosY+1][board.blankPosX] = 0;
-			board.start_state[board.blankPosY][board.blankPosX] = neighborDOWN;
-			System.out.println("Moving Down and Replacing " + neighborDOWN + " with 0");
+			swapTiles(board, "down", board.blankPosY, board.blankPosX, board.blankPosY+1, board.blankPosX);
+			board.blankPosY = board.blankPosY +1;
 			break;
 		
-		case "left":
-			//board.current_state = board.start_state;//resetting the board
-			
-			int neighborLEFT = board.start_state[board.blankPosY][board.blankPosX-1];
-			board.start_state[board.blankPosY][board.blankPosX-1] = 0;
-			board.start_state[board.blankPosY][board.blankPosX] = neighborLEFT;
-			System.out.println("Moving Left and Replacing " + neighborLEFT + " with 0");
+		case "left":			
+			swapTiles(board, "left", board.blankPosY, board.blankPosX, board.blankPosY, board.blankPosX-1);
+			board.blankPosX = board.blankPosX-1;
 			break;
 		
 		case "right":
-			//board.start_state = board.start_state;//resetting the board
-			int neighborRIGHT = board.start_state[board.blankPosY][board.blankPosX+1];
-			board.start_state[board.blankPosY][board.blankPosX+1] = 0;
-			board.start_state[board.blankPosY][board.blankPosX] = neighborRIGHT;
-			System.out.println("Moving right and Replacing " + neighborRIGHT + " with 0");
-			
+			swapTiles(board, "right", board.blankPosY, board.blankPosX, board.blankPosY, board.blankPosX+1);
+			board.blankPosX = board.blankPosX +1;
 			break;
 		}
 		
+	}
+	
+	public static void swapTiles(Board board, String direction, int row, int col, int newRow, int newCol){
+		int neighbor = board.start_state[newRow][newCol];
+		board.start_state[newRow][newCol] = 0;//place 0 at neighbor value
+		board.start_state[row][col] = neighbor;//place neighbor at blank
+		//System.out.println("Moving "+ direction +" and Replacing " + neighbor + " with 0");
+		Board.findMisplacedTiles(board, newRow, newCol, neighbor);
 	}
 	
 }
