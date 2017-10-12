@@ -9,7 +9,6 @@ public class Moves {
 	private Moves(){//non instantiable
 		
 	}
-	
 	/*
 	 * Checks if we can move in a specified direction
 	 * 		  0   1   2
@@ -28,34 +27,26 @@ public class Moves {
 		switch(direction){
 		
 		case "up":
-			if(board.blankPosY > 0){
-				//System.out.println("can move UP");
+			if(board.blankPosY > 0){//true = can move 
 				return true;
 			}
-			//System.out.println("can't move UP");
 			break;
 
 		case "down":
 			if(board.blankPosY < Board.boardSizeY -1 ){
-				//System.out.println("can move DOWN");
 				return true;
 			}
-			//System.out.println("can't move DOWN");
 			break;
 			
 		case "left":
 			if(board.blankPosX >0 ){
-				//System.out.println("can move LEFT");
 				return true;
 			}
-			//System.out.println("can't move LEFT");
 			break;
 		case "right":
 			if(board.blankPosX < Board.boardSizeX-1 ){
-				//System.out.println("can move RIGHT");
 				return true;
 			}
-			//System.out.println("can't move RIGHT");
 
 			break;
 		}
@@ -89,7 +80,6 @@ public class Moves {
 			board.blankPosX = board.blankPosX +1;
 			break;
 		}
-		
 	}
 	
 	public static void swapTiles(Board board, String direction, int row, int col, int newRow, int newCol){
@@ -99,5 +89,4 @@ public class Moves {
 		//System.out.println("Moving "+ direction +" and Replacing " + neighbor + " with 0");
 		Board.findMisplacedTiles(board, newRow, newCol, neighbor);
 	}
-	
 }

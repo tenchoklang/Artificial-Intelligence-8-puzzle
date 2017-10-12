@@ -8,9 +8,6 @@ import java.util.PriorityQueue;
 import java.util.Queue;
 import java.util.Stack;
 
-/* In a test environment
- * 
- */
 public class Algorithm {
 
 	private static String algorithmName;
@@ -40,7 +37,6 @@ public class Algorithm {
 		{3,2,1}
 	};
 	LinkedList<int[][]> puzzleBoard = new LinkedList<>();//to store the four puzzles
-	
 	/*
 	 * DATA STRUCTURES
 	 */
@@ -69,7 +65,6 @@ public class Algorithm {
 			Board board = new Board(puzzleBoard.get(puzzleBoardDifficulty));
 			Board.findMisplacedTiles(board, 0, 0, 0);
 			costBound = Board.findManhattanDistance(puzzleBoard.get(puzzleBoardDifficulty));
-			//System.out.println("Starting cost Bound: " + costBound);
 			int totalNodesVisited = 0;
 			
 			while(Board.goalStatus == false){
@@ -105,10 +100,6 @@ public class Algorithm {
 				}else{
 					board = removeFrom(board, algorithmName);
 				}
-				//System.out.println("BOARD LEVEL " + board.level);
-				//System.out.println("PICKED BOUND: " + costBound);
-//				System.out.println("QUEUE SIZE: " + fifo.size());
-				//System.out.println("-------------------------------");	
 			}
 			
 			System.out.println("ANSWER BOARD");
@@ -137,6 +128,10 @@ public class Algorithm {
 		}
 	}
 	
+	/*
+	 * Make a new board and make the move, assign parent, calculate the heuristic and add to the appropriate 
+	 * data structure for specified algorithm
+	 */
 	public static void newBoard(Board board, String direction, PriorityQueue<Board> openList){
 		Board newBoard = new Board(board.start_state);
 		Moves.move(direction, newBoard);
@@ -189,25 +184,7 @@ public class Algorithm {
 					lifo.pop(); //keep popping those who have lower costBounds
 				}
 			}
-		}
-		
+		}	
 		return null;
 	}
 }
-
-//while(true){
-//	if(lifo.peek().manhattanDistance <= costBound+1){
-//		if(lifo.peek().manhattanDistance<= costBound+1){
-//			costBound = lifo.peek().manhattanDistance;
-//		}
-//		board = lifo.pop();
-//		break;
-//	}else{
-//		if(lifo.size() ==1){
-//			board = lifo.pop();
-//			break;
-//		}
-//		lifo.pop();
-//	}
-//}
-//return board;

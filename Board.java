@@ -36,9 +36,7 @@ public class Board implements Comparable<Board>{
 		start_state = new int[boardSizeY][boardSizeX];
 		copyBoard(board);
 		findBlankPos();//locates the blank tile
-	}
-	
-	
+	}	
 	
 	public void findBlankPos(){//find blank position
 		for(int y =0; y<boardSizeY;y++){	
@@ -99,14 +97,12 @@ public class Board implements Comparable<Board>{
 		case "astar misplaced":
 			level = parentBoard.level + 1;//update the level
 			this.heuristic = level + misplacedTiles;
-			//System.out.println("Misplaced " + misplacedTiles);
 			break;
 			
 		case "astar manhattan":
 			level = parentBoard.level + 1;//update the level
 			manhattanDistance = findManhattanDistance(start_state);
 			heuristic = level + manhattanDistance;
-			//System.out.println("Manhatan " + (heuristic-level));
 			break;
 			
 		case "astar ida":
@@ -215,6 +211,3 @@ public static int findManhattanDistance(int[][] easyBoard){
 	}
 	
 }
-
-
-
